@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Вхід</h1>
+
+    <form action="" method="post" class="form-control" id="login-form">
+        {% csrf_token %}
+
+        {{form.as_p}}
+    </form>
+
+    <button type="submit" class="btn btn-primary" form="login-form">Ввійти</button>
+</div>
+{% endblock %}

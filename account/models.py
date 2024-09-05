@@ -7,8 +7,7 @@ from hashlib import shake_128
 
 class Profile(models.Model):
     account = models.OneToOneField("Account", on_delete=models.CASCADE, related_name="profile")
-    picture = models.ImageField(upload_to="profile_pictures/")
-
+    picture = models.ImageField(upload_to="profile_pictures/", blank=True)
 
 class AccountManager(BaseUserManager):
     def create_user(self, email, username, password=None):
