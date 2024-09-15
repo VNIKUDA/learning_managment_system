@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="text-bg-primary rounded mt-3" style="height: 30vh;">
+        <div class="d-flex flex-column justify-content-end h-100 py-3 px-4">
+            <h2 class="mb-1">{{course.name}}</h2>
+            <h4 class="fw-normal">{{course.teacher.username}}</h4>
+        </div>
+    </div>
+
+    <div class="d-flex gap-3 mt-3">
+        <div class="w-25">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Про курс</h4>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{course.description}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="w-75">
+            <div class="d-grid gap-2">
+                {% for module in course.modules.all %}
+                    <div class="accordion" id="modules">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button fw-medium collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#module{{module.pk}}" aria-expanded="false" aria-controls="module{{module.pk}}">{{module.name}}</button>
+                            </h2>
+                            <div id="module{{module.pk}}" class="accordion-collapse collapse">
+                                <div class="accordion-body p-0">
+                                    <ul class="list-group list-group-flush rounded-bottom">
+                                        {% for lesson in module.lessons.all %}
+                                            <a href="{% url 'courses:lesson-detail' lesson.pk %}" class="list-group-item list-group-action">{{lesson.title}}</a>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
