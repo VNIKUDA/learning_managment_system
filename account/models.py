@@ -9,6 +9,9 @@ class Profile(models.Model):
     account = models.OneToOneField("Account", on_delete=models.CASCADE, related_name="profile")
     picture = models.ImageField(upload_to="profile_pictures/", blank=True)
 
+    def __str__(self):
+        return self.account.username
+
 class AccountManager(BaseUserManager):
     def create_user(self, email, username, password=None):
         """
@@ -23,6 +26,8 @@ class AccountManager(BaseUserManager):
             username=username,
         )
 
+        Profile.objects.create(account=user)
+
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -33,6 +38,9 @@ class AccountManager(BaseUserManager):
             password=password,
             username=username,
         )
+
+        Profile.objects.create(account=user)
+
         user.role = "admin"
         user.save(using=self._db)
         return user
