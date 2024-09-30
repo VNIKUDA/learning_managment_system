@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% load completion %}
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-center gap-3">
+        <form action="{% url 'courses:lesson-update' lesson.pk %}" method="post" class="w-75">
+            {% csrf_token %}
+            <label for="title">Назва: </label>
+            <input type="text" name="title" id="title" class="form-control" value="{{lesson.title}}" required>
+            <hr>
+            <p>
+                <label for="description">Опис: </label>
+                <textarea name="description" id="description" class="form-control" required>{{lesson.description}}</textarea>
+            </p>
+
+            <button type="submit" class="btn btn-outline-success w-100">Зберегти зміни</button>
+            <a href="{% url 'courses:lesson-detail' lesson.pk %}" class="btn btn-secondary w-100 mt-2">Відхилити зміни</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

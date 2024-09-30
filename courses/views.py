@@ -143,6 +143,16 @@ class LessonDeleteView(DeleteView):
 
     def get_success_url(self) -> str:
         return reverse_lazy("courses:course-detail", kwargs={"pk": self.get_object().course.pk})
+    
+
+class LessonUpdateView(UpdateView):
+    model = Lesson
+    fields = ["title", "description"]
+    context_object_name = "lesson"
+    template_name = "courses/lesson_update.html"
+
+    def get_success_url(self) -> str:
+        return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().pk})
 
 class CompletionCreateView(CreateView):
     model = Completion
