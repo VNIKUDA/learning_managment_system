@@ -71,6 +71,10 @@ class Lesson(models.Model):
 
         return super(Lesson, self).delete(*args, **kwargs)
 
+    @property
+    def course(self):
+        return self.module.course
+
     def __str__(self):
         return self.title
 

@@ -137,6 +137,13 @@ class LessonDetailView(DetailView):
         return super().get_template_names()
 
 
+class LessonDeleteView(DeleteView):
+    model = Lesson
+    http_method_names = ["post"]
+
+    def get_success_url(self) -> str:
+        return reverse_lazy("courses:course-detail", kwargs={"pk": self.get_object().course.pk})
+
 class CompletionCreateView(CreateView):
     model = Completion
     fields = ["text"]

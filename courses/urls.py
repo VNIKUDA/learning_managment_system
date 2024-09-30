@@ -19,6 +19,7 @@ urlpatterns = [
 
     path("module/<int:pk>/lesson-create/", views.LessonCreateView.as_view(), name="lesson-create"),
     path("lesson/<int:pk>/", views.LessonDetailView.as_view(), name="lesson-detail"),
+    path("lesson/<int:pk>/delete", views.LessonDeleteView.as_view(), name="lesson-delete"),
 
     path("task/<int:pk>/complete/", views.CompletionCreateView.as_view(), name="completion-create"),
     path("task/<int:pk>/delete/", views.CompletionDeleteView.as_view(), name="completion-delete")
