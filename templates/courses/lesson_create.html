@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% load completion %}
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-center gap-3">
+        <form action="" method="post" class="w-75">
+            {% csrf_token %}
+            <label for="title">Назва: </label>
+            <input type="text" name="title" id="title" class="form-control" required>
+            <hr>
+            <p>
+                <label for="description">Опис: </label>
+                <textarea name="description" id="description" class="form-control" required></textarea>
+            </p>
+
+            <button type="submit" class="btn btn-primary w-100">Створити урок</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

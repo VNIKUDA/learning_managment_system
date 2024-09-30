@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <form action="{% url 'courses:course-update' course.pk %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="name" value="{{course.name}}" placeholder="Назва курсу" class="form-control fs-2">
+
+        <div class="d-flex gap-3 mt-3">
+            <div class="d-flex flex-column w-25 gap-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Про курс</h4>
+                    </div>
+                    <textarea name="description" id="" class="form-control border border-0" style="resize: vertical;">{{course.description}}</textarea>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Колір курсу</h4>
+                    </div>
+                    <select class="form-control border border-0" name="color" id="color">
+                        <option value="{{course.color}}" hidden>{{course.get_color_display}}</option>
+                        <option value="danger">червоний</option>
+                        <option value="primary">синій</option>
+                        <option value="success">зелений</option>
+                        <option value="info">голубий</option>
+                        <option value="dark">чорний</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-outline-success w-100">Зберегти зміни</button>
+                <a href="{% url 'courses:course-detail' course.pk %}" class="btn btn-secondary">Відхилити зміни</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

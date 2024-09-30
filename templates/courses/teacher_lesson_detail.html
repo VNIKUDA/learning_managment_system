@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% load completion %}
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-center gap-3">
+        <div class="w-75">
+            <h2 class="fw-semibold mb-0">{{lesson.title}}</h2>
+            <span>{{lesson.module.course.teacher.username}}, {{lesson.created_at}}</span>
+            <hr>
+            <p>{{lesson.description|linebreaks}}</p>
+            <div class="row">
+                {% for material in lesson.materials.all %}
+                    <div class="w-25">
+                        {% if material.name|endswith:".jpg .png" %}
+                            <a class="h-100 w-100" href="{{material.file.url}}" title="{{material.name}}" download>
+                                <img src="{{material.file.url}}" alt="" class="w-100 rounded">
+                            </a>
+                        {% else %}
+                            <a href="{{mateial.file.url}}" class="btn btn-dark w-100" title="{{material.name}}" download>
+                                <div class="d-flex align-items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+                                        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
+                                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                                    </svg>
+                                    <span class="fw-semibold">
+                                        {{material.name|truncatechars:13}}
+                                    </span>
+                                </div>
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% if lesson.tasks.exists %}
+                <hr>
+                <h4>Завдання</h4>
+                {% for task in lesson.tasks.all %}
+                    <ul class="list-group">
+                        <button type="button" class="list-group-item {% if request.user in task.students %}text-bg-success{% else %}text-bg-primary{% endif %} list-group-action rounded" data-bs-toggle="modal" data-bs-target="#task{{task.pk}}">
+                            {{task.name}}
+                        </button>
+                    </ul>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

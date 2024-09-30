@@ -10,6 +10,7 @@ admin.site.register(Profile)
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
     model = Account
+    list_display = ["email", "role"]
 
     def save_model(self, request: HttpRequest, obj, form: ModelForm, change: bool):
         super().save_model(request, obj, form, change)

@@ -4,13 +4,17 @@
 <div class="container-fluid h-100">
     
     {% if courses %}
-        <div class="row row-cols-1 row-cols-md-3">
+        <div class="row row-cols-1 row-cols-md-3 g-3">
             {% for course in courses %}
                 <div class="col">
-                    <div class="card text-bg-primary rounded" style="height: 30vh;">
+                    <div class="card text-bg-{{course.color}} rounded" style="height: 30vh;">
                         <div class="d-flex flex-column justify-content-end h-100 py-3 px-4">
                             <a href="{% url 'courses:course-detail' course.pk %}" class="h2 link-light link-underline link-offset-2 link-offset-2-hover link-underline-opacity-0 link-underline-opacity-100-hover mb-1">{{course.name}}</a>
-                            <h4 class="fw-normal">{{course.teacher.username}}</h4>
+                            {% if request.user.role != "teacher" %}
+                                <h4 class="fw-normal text-white">{{course.teacher.username}}</h4>
+                            {% else %}
+                                <span> </span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -18,7 +22,13 @@
         </div>
     {% else %}
         <div class="d-flex justify-content-center align-items-center w-100 h-100">
-            <h3>Ви не приєдналися до жодного з курсів</h3>
+            <h3>
+                {% if request.user.role == "teacher" %}
+                    Ви не створили жодного курсу                
+                {% else %}
+                    Ви не приєдналися до жодного з курсів
+                {% endif %}
+            </h3>
         </div>
     {% endif %}
 </div>

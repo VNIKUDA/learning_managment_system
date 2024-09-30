@@ -1,3 +1,4 @@
+from typing import Any, Iterable, MutableMapping
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.validators import MinLengthValidator
@@ -72,8 +73,12 @@ class Account(AbstractBaseUser):
         # Simplest possible answer: Yes, always
         return True
 
+    def save(self, *args, **kwargs) -> None:
+        super().save(*args, **kwargs)
+        
+        Profile.objects.get_or_create(account=self)
+
+
     @property
     def is_staff(self):
         return self.role in ["teacher", "admin"]
-
-

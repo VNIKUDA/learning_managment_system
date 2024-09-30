@@ -1,0 +1,7 @@
+<ul class="list-group mb-2">
+    {% for course in courses %}
+        <a href="{% url 'courses:course-detail' course.pk %}" class="list-group-item list-group-action btn bg-{{course.color}} text-white rounded-pill rounded-start text-start text-decoration-none py-2 ps-4" style="width: 75%; margin-bottom: 3px;">
+            <span class="fw-semibold">{{course.name}}</span>
+        </a>
+    {% endfor %}
+</ul>

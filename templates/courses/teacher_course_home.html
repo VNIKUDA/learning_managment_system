@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="bg-{{course.color}} text-white rounded mt-3" style="height: 30vh;">
+        <div class="d-flex flex-column justify-content-end h-100 py-3 px-4">
+            <h2 class="mb-1">{{course.name}}</h2>
+            <h4 class="fw-normal">{{course.teacher.username}}</h4>
+        </div>
+    </div>
+
+    <div class="d-flex gap-3 mt-3">
+        <div class="d-flex flex-column w-25 gap-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Про курс</h4>
+                </div>
+                <div class="card-body">
+                    {{course.description}}
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Код курсу</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-1">
+                        <span class="text-primary fs-5">{{course.join_code}}</span>
+                        <button type="button" class="btn px-2 py-1" onclick="copyCode();">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'courses:course-update' course.pk %}" class="btn btn-warning">Редагувати курс</a>
+            <form action="{% url 'courses:course-delete' course.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger w-100">Видалити курс</button>
+            </form>
+        </div>
+        <div class="w-75">
+            <div class="d-grid gap-2">
+                {% for module in course.modules.all %}
+                    <div class="accordion" id="modules">
+                        <div class="accordion-item">
+                            <h2 class="d-flex accordion-header">
+                                <button class="accordion-button fw-medium collapsed rounded-0 rounded-start" type="button" data-bs-toggle="collapse" data-bs-target="#module{{module.pk}}" aria-expanded="false" aria-controls="module{{module.pk}}" style="width: 95%;">
+                                    {{module.name}}
+                                </button>
+                                <div class="dropdown" style="width: 5%;">
+                                    <button type="button" class="d-flex align-items-center justify-content-center btn btn-warning w-100 h-100 border-0 rounded-0 rounded-end p-0" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                          </svg>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'courses:lesson-create' module.pk %}" class="dropdown-item">Створити урок</a></li>
+                                        <li><button type="button" data-bs-toggle="modal" data-bs-target="#module-modal{{module.pk}}" class="dropdown-item">Редагувати</button></li>
+                                        <li>
+                                            <form action="{% url 'courses:module-delete' module.pk %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item">Видалити</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </h2>
+                            <div id="module{{module.pk}}" class="accordion-collapse collapse">
+                                <div class="accordion-body p-0">
+                                    <ul class="list-group list-group-flush rounded-bottom">
+                                        {% for lesson in module.lessons.all %}
+                                            <a href="{% url 'courses:lesson-detail' lesson.pk %}" class="list-group-item list-group-action">{{lesson.title}}</a>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" tabindex="-1" id="module-modal{{module.pk}}" aria-labelledby="module-label{{module.pk}}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="module-label{{module.pk}}">Редагувати модуль</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{% url 'courses:module-update' module.pk %}" method="post" id="module-update{{module.pk}}" class="modal-body">
+                                    {% csrf_token %}
+                                    <label for="name">Назва: </label>
+                                    <input type="text" name="name" id="name" class="form-control" value="{{module.name}}" required>
+                                </form>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Відхилити</button>
+                                    <button type="submit" class="btn btn-success" form="module-update{{module.pk}}">Змінити</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#create-module">+ Новий модуль</button>
+                <div class="modal fade" tabindex="-1" id="create-module" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Створення модуля</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{% url 'courses:module-create' course.pk %}" method="post" class="modal-body" id="module-create">
+                                {% csrf_token %}
+                                <label for="name">Назва: </label>
+                                <input type="text" name="name" id="name" class="form-control">
+                            </form>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" form="module-create">Створити</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyCode() {
+        navigator.clipboard.writeText('{{course.join_code}}');
+    }
+</script>
+{% endblock %}

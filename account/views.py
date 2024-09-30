@@ -20,7 +20,6 @@ class LoginView(DefaultLoginView):
 
 @method_decorator(login_not_required, name="dispatch")
 class RegistrationView(CreateView):
-    model = User
     form_class = RegistrationForm
     template_name = "account/register.html"
     success_url = reverse_lazy("account:login")

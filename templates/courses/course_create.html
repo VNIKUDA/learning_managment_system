@@ -4,10 +4,22 @@
 <div class="container">
     <form action="{% url 'courses:course-create' %}" method="post">
         {% csrf_token %}
+        <input type="text" name="name" value="{{course.name}}" placeholder="Назва курсу" class="form-control fs-2">
 
-        {{form.as_p}}
+        <div class="d-flex gap-3 mt-3">
+            <div class="d-flex flex-column w-25 gap-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Про курс</h4>
+                    </div>
+                    <div class="card-body">
+                        <textarea name="description" id="" class="form-control" style="resize: vertical;">{{course.description}}</textarea>
+                    </div>
+                </div>
 
-        <button type="submit">Створити</button>
+                <button type="submit" class="btn btn-primary w-100">Створити курс</button>
+            </div>
+        </div>
     </form>
 </div>
 {% endblock %}
