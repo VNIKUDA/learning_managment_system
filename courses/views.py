@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import CreateView, DetailView, DeleteView, UpdateView, View
 from courses.mixins import UserIsStaff
 from courses.forms import CompletionForm
-from courses.models import Course, Module, Lesson, Completion, CompletionFile, Task
+from courses.models import Course, Module, Lesson, Material, Completion, CompletionFile, Task
 
 # Create your views here.
 class CourseCreateView(UserIsStaff, CreateView):
@@ -153,6 +153,22 @@ class LessonUpdateView(UpdateView):
 
     def get_success_url(self) -> str:
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().pk})
+
+
+class MaterialsCreateView(View):
+    http_method_names = ["post"]
+
+    def get_lesson(self):
+        return Lesson.objects.get(pk=self.kwargs.get("pk"))
+
+    def post(self, *args, **kwargs):
+        lesson = self.get_lesson()
+
+        for file in self.request.FILES.getlist("files"):
+            Material.objects.create(lesson=lesson, file=file)
+
+        return redirect(reverse_lazy("courses:lesson-detail", kwargs={"pk": lesson.pk}))
+
 
 class CompletionCreateView(CreateView):
     model = Completion

@@ -48,9 +48,8 @@
             <span>{{lesson.created_at}}</span>
             <hr>
             <p>{{lesson.description|linebreaks}}</p>
-            <div class="row">
+            <div class="d-grid">
                 {% for material in lesson.materials.all %}
-                    <div class="w-25">
                         {% if material.name|endswith:".jpg .png" %}
                             <a class="h-100 w-100" href="{{material.file.url}}" title="{{material.name}}" download>
                                 <img src="{{material.file.url}}" alt="" class="w-100 rounded">
@@ -68,9 +67,27 @@
                                 </div>
                             </a>
                         {% endif %}
-                    </div>
                 {% endfor %}
             </div>
+            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#materials-create">Створити матеріали</button>
+            <div class="modal fade" tabindex="-1" id="materials-create" aria-labelledby="materialsLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="materialsLabel">Створити матеріали</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="{% url 'courses:materials-create' lesson.pk %}" method="post" class="modal-body" id="materials-create-form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="file" name="files" class="form-control" multiple>
+                        </form>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" form="materials-create-form">Створити</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {% if lesson.tasks.exists %}
                 <hr>
                 <h4>Завдання</h4>
