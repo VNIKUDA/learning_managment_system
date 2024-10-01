@@ -170,6 +170,14 @@ class MaterialsCreateView(View):
         return redirect(reverse_lazy("courses:lesson-detail", kwargs={"pk": lesson.pk}))
 
 
+class MaterialDeleteView(DeleteView):
+    model = Material
+    http_method_names = ["post"]
+
+    def get_success_url(self) -> str:
+        return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().lesson.pk})
+    
+
 class CompletionCreateView(CreateView):
     model = Completion
     fields = ["text"]

@@ -48,28 +48,52 @@
             <span>{{lesson.created_at}}</span>
             <hr>
             <p>{{lesson.description|linebreaks}}</p>
-            <div class="d-grid">
+            <div class="d-grid gap-1">
                 {% for material in lesson.materials.all %}
-                        {% if material.name|endswith:".jpg .png" %}
-                            <a class="h-100 w-100" href="{{material.file.url}}" title="{{material.name}}" download>
-                                <img src="{{material.file.url}}" alt="" class="w-100 rounded">
-                            </a>
-                        {% else %}
-                            <a href="{{mateial.file.url}}" class="btn btn-dark w-100" title="{{material.name}}" download>
-                                <div class="d-flex align-items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
-                                        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
-                                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-                                    </svg>
-                                    <span class="fw-semibold">
-                                        {{material.name|truncatechars:13}}
-                                    </span>
-                                </div>
-                            </a>
-                        {% endif %}
+                    {% if material.name|endswith:".jpg .png" %}
+                        <!-- <a class="h-100 w-100" href="{{material.file.url}}" title="{{material.name}}" download>
+                            <img src="{{material.file.url}}" alt="" class="w-100 rounded">
+                        </a> -->
+                    {% else %}
+                    {% endif %}
+                    <div class="btn-group" role="group">
+                        <a href="{{mateial.file.url}}" class="btn btn-dark w-100" title="{{material.name}}" download>
+                            <div class="d-flex align-items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+                                    <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
+                                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                                </svg>
+                                <span class="fw-semibold">
+                                    {{material.name|truncatechars:56}}
+                                </span>
+                            </div>
+                        </a>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-warning rounded-end" data-bs-toggle="dropdown">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                </svg>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <form action="{% url 'courses:material-delete' material.pk %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                    <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                                                </svg>
+                                                Видалити
+                                            </div>
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 {% endfor %}
             </div>
-            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#materials-create">Створити матеріали</button>
+            <button type="button" class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#materials-create">Створити матеріали</button>
             <div class="modal fade" tabindex="-1" id="materials-create" aria-labelledby="materialsLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
