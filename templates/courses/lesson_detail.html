@@ -14,125 +14,125 @@
             <span>{{lesson.module.course.teacher.username}}, {{lesson.created_at}}</span>
             <hr>
             <p>{{lesson.description|linebreaks}}</p>
-            <div class="row">
+            <div class="d-grid gap-1 mt-2">
                 {% for material in lesson.materials.all %}
-                    <div class="w-25">
-                        {% if material.name|endswith:".jpg .png" %}
-                            <a class="h-100 w-100" href="{{material.file.url}}" title="{{material.name}}" download>
-                                <img src="{{material.file.url}}" alt="" class="w-100 rounded">
-                            </a>
-                        {% else %}
-                            <a href="{{mateial.file.url}}" class="btn btn-dark w-100" title="{{material.name}}" download>
-                                <div class="d-flex align-items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
-                                        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
-                                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-                                    </svg>
-                                    <span class="fw-semibold">
-                                        {{material.name|truncatechars:13}}
-                                    </span>
-                                </div>
-                            </a>
-                        {% endif %}
-                    </div>
+                    <a href="{{mateial.file.url}}" class="btn btn-dark w-100" title="{{material.name}}" download>
+                        <div class="d-flex align-items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+                                <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
+                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                            </svg>
+                            <span class="fw-semibold">
+                                {{material.name|truncatechars:56}}
+                            </span>
+                        </div>
+                    </a>
                 {% endfor %}
             </div>
             {% if lesson.tasks.exists %}
                 <hr>
                 <h4>Завдання</h4>
                 {% for task in lesson.tasks.all %}
-                    <ul class="list-group">
-                        <button type="button" class="list-group-item {% if request.user in task.students %}text-bg-success{% else %}text-bg-primary{% endif %} list-group-action rounded" data-bs-toggle="modal" data-bs-target="#task{{task.pk}}">
-                            {{task.name}}
-                        </button>
-                        
-                        <div class="modal fade modal-xl" tabindex="-1" id="task{{task.pk}}">
-                            <div class="modal-dialog modal-fullscreen">
-                                <form class="modal-content" action="{% url 'courses:completion-create' task.pk %}" method="post" enctype="multipart/form-data">
-                                    {% csrf_token %}
+                    <button type="button" class="btn btn-{% if request.user in task.students %}success{% else %}primary{% endif %} w-100 mb-1" data-bs-toggle="modal" data-bs-target="#task{{task.pk}}">
+                        {{task.name}}
+                    </button>
+                    
+                    <div class="modal fade modal-xl" tabindex="-1" id="task{{task.pk}}">
+                        <div class="modal-dialog modal-fullscreen">
+                            <form class="modal-content" action="{% url 'courses:completion-create' task.pk %}" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
 
-                                    <div class="modal-header {% if request.user in task.students %}text-bg-success{% else %}text-bg-primary{% endif %}">
-                                        <h5 class="modal-title">{{task.name}}</h5>
-                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 1 !important;"></button>
-                                    </div>
-                                    <div class="modal-body p-0">
-                                        <div class="d-flex h-100">
-                                            <div class="container w-25 border-end overflow-y-auto">
-                                                <p class="mt-2">{{task.description}}</p>
-                                            </div>
-                                            <div class="container w-75 mt-2 overflow-y-auto">
-                                                <h2>Ваша робота</h2>
+                                <div class="modal-header {% if request.user in task.students %}text-bg-success{% else %}text-bg-primary{% endif %}">
+                                    <h5 class="modal-title">{{task.name}}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 1 !important;"></button>
+                                </div>
+                                <div class="modal-body p-0">
+                                    <div class="d-flex h-100">
+                                        <div class="container w-25 border-end overflow-y-auto">
+                                            <p class="mt-2">{{task.description}}</p>
+                                        </div>
+                                        <div class="container w-75 mt-2 overflow-y-auto">
+                                            <h2>Ваша робота</h2>
 
-                                                {% if request.user in task.students %}
-                                                    {% with completion=task.completions.all|get_completion:request.user %}
+                                            {% if request.user in task.students %}
+                                                {% with completion=task.completions.all|get_completion:request.user %}
+                                                    {% if completion.text %}
                                                         <hr>
                                                         <p class="mt-2 ps-2 fs-5">
                                                             {{completion.text}}
                                                         </p>
+                                                    {% endif %}
+
+                                                    {% if completion.files.exists %}
                                                         <hr>
-                                                        <div class="row">
+                                                        <div class="d-grid gap-1">
                                                             {% for file in completion.files.all %}
-                                                                <div class="w-25">
-                                                                    {% if file.name|endswith:".jpg .png" %}
-                                                                        <a class="h-100 w-100" href="{{mateial.file.url}}" download>
-                                                                            <img src="{{mateial.file.url}}" alt="" class="w-100 rounded">
-                                                                        </a>
-                                                                    {% else %}
-                                                                    <a href="{{mateial.file.url}}" class="btn btn-dark w-100" download>
-                                                                        <div class="d-flex align-items-center gap-1">
-                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
-                                                                                <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
-                                                                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-                                                                            </svg>
-                                                                            <span class="fw-semibold">
-                                                                                {{mateial.name}}
-                                                                            </span>
-                                                                        </div>
-                                                                    </a>
-                                                                    {% endif %}
-                                                                </div>
+                                                                <a href="{{file.file.url}}" class="btn btn-dark w-100" download>
+                                                                    <div class="d-flex align-items-center gap-1">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+                                                                            <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
+                                                                            <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                                                                        </svg>
+                                                                        <span class="fw-semibold">
+                                                                            {{file.name}}
+                                                                        </span>
+                                                                    </div>
+                                                                </a>
                                                             {% endfor %}
                                                         </div>
-                                                        
-                                                    {% endwith %}
-                                                {% else %}
-                                                    <p>
-                                                        <input type="file" class="form-control w-75" name="files" id="files" multiple>
-                                                    </p>
-                                                    <p>
-                                                        <textarea class="form-control" name="text" id="" rows="15" style="resize: none;"></textarea>
-                                                    </p>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <div class="d-flex justify-content-between w-100">
-                                            <span class="fw-semibold fs-4">
-                                                {% if request.user in task.students %}
-                                                    {% with completion=task.completions.all|get_completion:request.user %}
-                                                        {% if completion.grade %}
-                                                            Оцінено: {{completion.grade.grade}}
-                                                        {% else %}
-                                                            Здано
-                                                        {% endif %}
-                                                    {% endwith %}
-                                                {% else %}
-                                                    Не здано
-                                                {% endif %}
-                                            </span>
-
-                                            {% if request.user in task.students %}
-                                                <button type="submit" formaction="{% url 'courses:completion-delete' task.pk %}" class="btn btn-danger">Скасувати відправлення</button>
+                                                    {% endif %}
+                                                {% endwith %}
                                             {% else %}
-                                                <button type="submit" class="btn btn-primary">Підвтердити та здати</button>
+                                                <p>
+                                                    <input type="file" class="form-control w-75" name="files" id="files" multiple>
+                                                </p>
+                                                <p>
+                                                    <textarea class="form-control" name="text" id="" rows="15" style="resize: none;"></textarea>
+                                                </p>
                                             {% endif %}
                                         </div>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="d-flex justify-content-between w-100">
+                                        <span class="fw-semibold fs-4">
+                                            {% if request.user in task.students %}
+                                                {% with completion=task.completions.all|get_completion:request.user %}
+                                                    {% if completion.grade %}
+                                                        Оцінено: {{completion.grade.grade}}
+                                                    {% else %}
+                                                        Здано
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% else %}
+                                                Не здано
+                                            {% endif %}
+                                        </span>
+
+                                        {% if request.user in task.students %}
+                                            <button type="submit" formaction="{% url 'courses:completion-delete' task.pk %}" class="btn btn-danger">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                                    </svg>
+                                                    Скасувати відправлення
+                                                </div>
+                                            </button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-primary">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+                                                        <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"/>
+                                                    </svg>
+                                                    Підвтердити та здати
+                                                </div>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </ul>
+                    </div>
                 {% endfor %}
             {% endif %}
         </div>
