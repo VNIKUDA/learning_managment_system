@@ -190,6 +190,15 @@ class TaskCreateView(CreateView):
     
     def get_success_url(self) -> str:
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.kwargs.get("pk")})
+    
+
+class TaskDeleteView(DeleteView):
+    model = Task
+    http_method_names = ["post"]
+
+    def get_success_url(self) -> str:
+        return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().lesson.pk})
+
 
 class CompletionCreateView(CreateView):
     model = Completion

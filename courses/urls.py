@@ -26,6 +26,7 @@ urlpatterns = [
     path("material/<int:pk>/delete/", views.MaterialDeleteView.as_view(), name="material-delete"),
 
     path("lesson/<int:pk>/task-create/", views.TaskCreateView.as_view(), name="task-create"),
+    path("task/<int:pk>/delete/", views.TaskDeleteView.as_view(), name="task-delete"),
 
     path("task/<int:pk>/complete/", views.CompletionCreateView.as_view(), name="completion-create"),
     path("task/<int:pk>/delete-completion/", views.CompletionDeleteView.as_view(), name="completion-delete")
