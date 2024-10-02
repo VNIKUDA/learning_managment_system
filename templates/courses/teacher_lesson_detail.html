@@ -89,7 +89,14 @@
                     </div>
                 {% endfor %}
             </div>
-            <button type="button" class="btn btn-primary w-100 mt-1" data-bs-toggle="modal" data-bs-target="#materials-create">Створити матеріали</button>
+            <button type="button" class="btn btn-primary w-100 mt-1" data-bs-toggle="modal" data-bs-target="#materials-create">
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                    </svg>
+                    Створити матеріали
+                </div>
+            </button>
             <div class="modal fade" tabindex="-1" id="materials-create" aria-labelledby="materialsLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -200,7 +207,14 @@
 
             {% endfor %}
 
-            <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#task-create">Створити завдання</button>
+            <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#task-create">
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                    </svg>
+                    Створити завдання
+                </div>
+            </button>
             <div class="modal fade" tabindex="-1" id="task-create" aria-labelledby="taskCreateLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
@@ -222,7 +236,14 @@
                             </p>
                         </form>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary" form="task-create-form">Створити</button>
+                            <button type="submit" class="btn btn-primary" form="task-create-form">
+                                <div class="d-flex align-items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                                    </svg>
+                                    Створити
+                                </div>
+                            </button>
                         </div>
                     </div>
                 </div>
