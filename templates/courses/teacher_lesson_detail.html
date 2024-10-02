@@ -47,15 +47,11 @@
             </div>
             <span>{{lesson.created_at}}</span>
             <hr>
+
             <p>{{lesson.description|linebreaks}}</p>
-            <div class="d-grid gap-1">
+
+            <div class="d-grid gap-1 mt-2">
                 {% for material in lesson.materials.all %}
-                    {% if material.name|endswith:".jpg .png" %}
-                        <!-- <a class="h-100 w-100" href="{{material.file.url}}" title="{{material.name}}" download>
-                            <img src="{{material.file.url}}" alt="" class="w-100 rounded">
-                        </a> -->
-                    {% else %}
-                    {% endif %}
                     <div class="btn-group" role="group">
                         <a href="{{mateial.file.url}}" class="btn btn-dark w-100" title="{{material.name}}" download>
                             <div class="d-flex align-items-center gap-1">
@@ -74,7 +70,7 @@
                                     <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
                                 </svg>
                             </button>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
                                     <form action="{% url 'courses:material-delete' material.pk %}" method="post">
                                         {% csrf_token %}
@@ -93,7 +89,7 @@
                     </div>
                 {% endfor %}
             </div>
-            <button type="button" class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#materials-create">Створити матеріали</button>
+            <button type="button" class="btn btn-primary w-100 mt-1" data-bs-toggle="modal" data-bs-target="#materials-create">Створити матеріали</button>
             <div class="modal fade" tabindex="-1" id="materials-create" aria-labelledby="materialsLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -112,17 +108,64 @@
                 </div>
             </div>
 
-            {% if lesson.tasks.exists %}
-                <hr>
-                <h4>Завдання</h4>
-                {% for task in lesson.tasks.all %}
-                    <ul class="list-group">
-                        <button type="button" class="list-group-item {% if request.user in task.students %}text-bg-success{% else %}text-bg-primary{% endif %} list-group-action rounded" data-bs-toggle="modal" data-bs-target="#task{{task.pk}}">
-                            {{task.name}}
-                        </button>
-                    </ul>
-                {% endfor %}
-            {% endif %}
+            <hr>
+            <h4 class="text-center w-100">Завдання</h4>
+            {% for task in lesson.tasks.all %}
+                <ul class="list-group">
+                    <button type="button" class="list-group-item {% if request.user in task.students %}text-bg-success{% else %}text-bg-primary{% endif %} list-group-action rounded" data-bs-toggle="modal" data-bs-target="#task{{task.pk}}">
+                        {{task.name}}
+                    </button>
+                </ul>
+
+                <div class="modal fade modal-xl" tabindex="-1" id="task{{task.pk}}">
+                    <div class="modal-dialog modal-fullscreen">
+                        <div class="modal-content">
+                            <div class="modal-header {% if request.user in task.students %}text-bg-success{% else %}text-bg-primary{% endif %}">
+                                <h5 class="modal-title">{{task.name}}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 1 !important;"></button>
+                            </div>
+                            <div class="modal-body p-0">
+                                <div class="d-flex h-100">
+                                    <div class="container w-25 border-end overflow-y-auto">
+                                        <p class="mt-2">{{task.description}}</p>
+                                    </div>
+                                    <div class="container w-75 mt-2 overflow-y-auto"></div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <button type="button" class="btn btn-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#task-create">Створити завдання</button>
+            <div class="modal fade" tabindex="-1" id="task-create" aria-labelledby="taskCreateLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="taskCreateLabel">Створити завдання</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{% url 'courses:task-create' lesson.pk %}" method="post" id="task-create-form" class="modal-body">
+                            {% csrf_token %}
+
+                            <p>
+                                <label for="task-name">Назва: </label>
+                                <input type="text" class="form-control" name="name" id="task-name" required>
+                            </p>
+
+                            <p>
+                                <label for="task-description">Опис: </label>
+                                <textarea class="form-control" name="description" id="task-description" rows="5"></textarea>
+                            </p>
+                        </form>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" form="task-create-form">Створити</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

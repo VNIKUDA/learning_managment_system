@@ -178,6 +178,19 @@ class MaterialDeleteView(DeleteView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().lesson.pk})
     
 
+class TaskCreateView(CreateView):
+    model = Task
+    fields = ["name", "description"]
+    http_method_names = ["post"]
+    
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        form.instance.lesson = Lesson.objects.get(pk=self.kwargs.get("pk"))
+
+        return super().form_valid(form)
+    
+    def get_success_url(self) -> str:
+        return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.kwargs.get("pk")})
+
 class CompletionCreateView(CreateView):
     model = Completion
     fields = ["text"]
