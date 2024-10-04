@@ -113,6 +113,7 @@ class Completion(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={"role": "student"})
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="completions")
     text = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def delete(self, *args, **kwargs):
         for completion_file in self.files.all():
@@ -141,7 +142,7 @@ class CompletionFile(models.Model):
 
 
 class Grade(models.Model):
-    grade = models.PositiveIntegerField(default=0)
+    value = models.PositiveIntegerField(default=0)
     completion = models.OneToOneField(Completion, on_delete=models.CASCADE, related_name="grade")
 
     def __str__(self) -> str:

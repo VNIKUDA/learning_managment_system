@@ -95,11 +95,11 @@
                                 </div>
                                 <div class="modal-footer">
                                     <div class="d-flex justify-content-between w-100">
-                                        <span class="fw-semibold fs-4">
+                                        <span class="fst-normal fs-4">
                                             {% if request.user in task.students %}
                                                 {% with completion=task.completions.all|get_completion:request.user %}
                                                     {% if completion.grade %}
-                                                        Оцінено: {{completion.grade.grade}}
+                                                        Оцінено: <b>{{completion.grade.value}}</b>
                                                     {% else %}
                                                         Здано
                                                     {% endif %}

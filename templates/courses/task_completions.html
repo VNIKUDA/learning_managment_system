@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card mb-4">
+        <h3 class="card-header text-bg-primary">{{task.name}}</h3>
+        <div class="card-body">
+            {{task.description}}
+        </div>
+        <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+                <span>
+                    Робіт надіслано: <b>{{completions|length}}</b>
+                </span>
+                <a href="{% url 'courses:lesson-detail' task.lesson.pk %}" class="btn btn-info">Повернутись до урока</a>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="text-center w-100">Роботи учнів</h2>
+    {% for completion in completions %}
+        <div class="text-bg-light border rounded-1 p-2 fs-5">
+            <div class="d-flex justify-content-between align-items-center px-3 position-relative">
+                <div class="d-flex align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="bg-body rounded-circle" width="32" height="32" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                    </svg>
+                    {{completion.student.username}}
+                </div>
+
+                <div class="position-absolute top-50 start-50 translate-middle">
+                    {{completion.created_at|date:"H:i d.m.Y"}}
+                </div>
+                
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#completion{{completion.pk}}">Дивитись роботу</button>
+            </div>
+        </div>
+    
+        <div class="modal fade" tabindex="-1" id="completion{{completion.pk}}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content" style="height: 90vh;">
+                    <div class="modal-header text-bg-success">
+                        <h3>{{completion.student.username}}</h3>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 1 !important;"></button>
+                    </div>
+                    <div class="modal-body overflow-y-auto px-3">
+                        <p class="modal-text">
+                            {{completion.text}}
+                        </p>
+
+                        {% if completion.text and completion.files.exists %}
+                            <hr>
+                        {% endif %}
+
+                        {% if completion.files.exists %}
+                            <div class="d-grid gap-1">
+                                {% for file in completion.files.all %}
+                                    <a href="{{file.file.url}}" class="btn btn-dark w-100" download>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+                                                <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
+                                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                                            </svg>
+                                            <span class="fw-semibold">
+                                                {{file.name}}
+                                            </span>
+                                        </div>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer fs-5">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            {% if completion.grade %}
+                                <span>
+                                    Оцінено: <b>{{completion.grade.value}}</b>
+                                </span>
+    
+                                <form action="{% url 'courses:grade-delete' completion.grade.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Видалити оцінку</button>
+                                </form>
+                            {% else %}
+                                <div class="d-flex align-items-center gap-3 w-25">
+                                    <label for="value">Оцінити: </label>
+                                    <input type="number" class="form-control" name="value" id="value" value="0" min="0" form="grade-completion" required>
+                                </div>
+    
+                                <form action="{% url 'courses:grade-completion' completion.pk %}" method="post" id="grade-completion">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary">Оцінити</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

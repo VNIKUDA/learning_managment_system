@@ -5,10 +5,10 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
-from django.views.generic import CreateView, DetailView, DeleteView, UpdateView, View
+from django.views.generic import CreateView, DetailView, DeleteView, UpdateView, ListView, View
 from courses.mixins import UserIsStaff
 from courses.forms import CompletionForm
-from courses.models import Course, Module, Lesson, Material, Completion, CompletionFile, Task
+from courses.models import Course, Module, Lesson, Material, Completion, CompletionFile, Task, Grade
 
 # Create your views here.
 class CourseCreateView(UserIsStaff, CreateView):
@@ -77,6 +77,29 @@ class LeaveCourseView(View):
         course.students.remove(self.request.user)
 
         return redirect("home")
+    
+
+class StudentCourses(View):
+    def get(self, *args, **kwargs):
+        if self.request.headers.get('x-requested-with') == "XMLHttpRequest":
+            courses = Course.objects.filter(students=self.request.user)
+            context = {"courses": courses}
+
+            return render(self.request, "courses/user_courses.html", context=context)
+        else:
+            raise PermissionDenied
+        
+
+class TeacherCourses(View):
+    def get(self, *args, **kwargs):
+        if self.request.headers.get('x-requested-with') == "XMLHttpRequest":
+            courses = Course.objects.filter(teacher=self.request.user)
+            context = {"courses": courses}
+
+            return render(self.request, "courses/user_courses.html", context=context)
+        else:
+            raise PermissionDenied
+
 
 class ModuleCreateView(CreateView):
     model = Module
@@ -209,6 +232,24 @@ class TaskDeleteView(DeleteView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().lesson.pk})
 
 
+class TaskCompletionsView(ListView):
+    model = Completion
+    context_object_name = "completions"
+    template_name = "courses/task_completions.html"
+
+    def get_queryset(self):
+        task = Task.objects.get(pk=self.kwargs.get("pk"))
+
+        return Completion.objects.filter(task=task)
+    
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+
+        context["task"] = Task.objects.get(pk=self.kwargs.get("pk"))
+
+        return context
+
+
 class CompletionCreateView(CreateView):
     model = Completion
     fields = ["text"]
@@ -252,23 +293,27 @@ class CompletionDeleteView(DeleteView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": task.lesson.pk})
     
 
-class StudentCourses(View):
-    def get(self, *args, **kwargs):
-        if self.request.headers.get('x-requested-with') == "XMLHttpRequest":
-            courses = Course.objects.filter(students=self.request.user)
-            context = {"courses": courses}
+class GradeCompletionView(CreateView):
+    model = Grade
+    fields = ["value"]
+    http_method_names = ["post"]
 
-            return render(self.request, "courses/user_courses.html", context=context)
-        else:
-            raise PermissionDenied
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        form.instance.completion = Completion.objects.get(pk=self.kwargs.get("pk"))
         
+        return super().form_valid(form)
 
-class TeacherCourses(View):
-    def get(self, *args, **kwargs):
-        if self.request.headers.get('x-requested-with') == "XMLHttpRequest":
-            courses = Course.objects.filter(teacher=self.request.user)
-            context = {"courses": courses}
+    def get_success_url(self) -> str:
+        completion = Completion.objects.get(pk=self.kwargs.get("pk"))
 
-            return render(self.request, "courses/user_courses.html", context=context)
-        else:
-            raise PermissionDenied
+        return reverse_lazy("courses:task-completions", kwargs={"pk": completion.task.pk})
+
+
+class GradeDeleteView(DeleteView):
+    model = Grade
+    http_method_names = ["post"]
+
+    def get_success_url(self) -> str:
+        completion = self.get_object().completion
+
+        return reverse_lazy("courses:task-completions", kwargs={"pk": completion.task.pk})
