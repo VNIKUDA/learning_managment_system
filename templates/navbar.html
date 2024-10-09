@@ -9,6 +9,14 @@
             </a>
         </div>
 
+        <span class="fw-semibold">
+            {% if request.user.role == "teacher" %}
+                Teacher version
+            {% else %}
+                Student version
+            {% endif %}
+        </span>
+
         <div class="d-flex align-items-center gap-3">
             {% if request.user.role == "teacher" %}
                 <a href="{% url 'courses:course-create' %}" class="btn btn-light rounded-circle p-0" title="Створити курс">

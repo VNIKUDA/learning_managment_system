@@ -10,15 +10,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>Вхід</h1>
-    
-        <form action="{% url 'account:login' %}" method="post" class="form-control" id="login">
-            {% csrf_token %}
-    
-            {{ form.as_p }}
-        </form>
-    
-        <button type="submit" form="login" class="btn btn-primary">Ввійти</button>
+        <div class="d-flex flex-column justify-content-center align-items-center gap-3" style="height: 100vh;">
+            <h1>Вхід в аккаунт</h1>
+        
+            <form action="{% url 'account:login' %}" method="post" class="form-control w-50" id="login">
+                {% csrf_token %}
+        
+                {{ form.as_p }}
+            </form>
+        
+            <a href="{% url 'account:register' %}">Ще не маєте аккаунта? Зареєструйтесь зараз.</a>
+
+            <button type="submit" form="login" class="btn btn-primary fw-semibold w-50">Ввійти</button>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
