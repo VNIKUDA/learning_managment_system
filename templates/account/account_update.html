@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex gap-3">
+        <div class="d-grid gap-3 w-25">
+            <div class="card">
+                <h5 class="card-header">Аватар профіля</h5>
+                <div class="card-body">
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                        {% if profile.picture %}
+                            <img src="{{profile.picture.url}}" class="rounded-circle" alt="" style="width: 180px; height: 180px; object-fit: cover;">
+                            <input type="file" name="picture" form="account-update" class="form-control">
+                        {% else %}
+                            <input type="file" name="picture" form="account-update" class="form-control">
+                        {% endif %}
+                        <p class="card-text fs-4 mt-2">
+                            {{profile.account.username}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+    
+            <button type="submit" class="btn btn-success w-100" form="account-update">
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
+                        <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
+                    </svg>
+                    Зберегти зміни
+                </div>
+            </button>
+    
+            <a href="{% url 'account:profile' %}" class="btn btn-secondary w-100">
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
+                        <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
+                    </svg>
+                    Відмінити
+                </div>
+            </a>
+        </div>
+
+        <div class="card w-75" style="height: fit-content;">
+            <h5 class="card-header">Ім'я</h5>
+            <form action="{% url 'account:account-update' %}" method="post" enctype="multipart/form-data" class="card-body" id="account-update">
+                {% csrf_token %}
+                <input type="text" name="username" value="{{account.username}}" class="form-control" required>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}
