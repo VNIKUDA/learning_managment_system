@@ -82,3 +82,7 @@ class Account(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.role in ["teacher", "admin"]
+    
+    @property
+    def is_teacher(self):
+        return self.role == "teacher"

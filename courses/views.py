@@ -6,12 +6,12 @@ from django.urls import reverse_lazy
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, DetailView, DeleteView, UpdateView, ListView, View
-from courses.mixins import UserIsStaff
+from courses import mixins
 from courses.forms import CompletionForm
 from courses.models import Course, Module, Lesson, Material, Completion, CompletionFile, Task, Grade
 
 # Create your views here.
-class CourseCreateView(UserIsStaff, CreateView):
+class CourseCreateView(mixins.UserIsTeacher, CreateView):
     model = Course
     fields = ["name", "description"]
     template_name = "courses/course_create.html"
@@ -26,13 +26,13 @@ class CourseCreateView(UserIsStaff, CreateView):
         return reverse_lazy("courses:course-detail", kwargs={"pk": self.object.pk})
     
 
-class CourseDeleteView(UserIsStaff, DeleteView):
+class CourseDeleteView(mixins.TeacherIsCourseOwner, DeleteView):
     model = Course
     http_method_names = ["post"]
     success_url = reverse_lazy("home")
 
 
-class CourseUpdateView(UserIsStaff, UpdateView):
+class CourseUpdateView(mixins.TeacherIsCourseOwner, UpdateView):
     model = Course
     fields = ["name", "description", "color"]
     context_object_name = "course"
@@ -67,13 +67,15 @@ class JoinCourseView(View):
         return redirect(reverse_lazy("courses:course-detail", kwargs={"pk": course.pk}))
 
 
-class LeaveCourseView(View):
+class LeaveCourseView(mixins.UserIsCourseStudent, View):
     http_method_names = ["post"]
 
-    def post(self, *args, **kwargs):
-        course_pk = self.kwargs.get("pk")
+    def get_course(self):
+        return Course.objects.get(pk=self.kwargs.get("pk"))
 
-        course: Course = Course.objects.get(pk=course_pk)
+    def post(self, *args, **kwargs):
+        course = self.get_course()
+
         course.students.remove(self.request.user)
 
         return redirect("home")
@@ -101,13 +103,16 @@ class TeacherCourses(View):
             raise PermissionDenied
 
 
-class ModuleCreateView(CreateView):
+class ModuleCreateView(mixins.TeacherIsCourseOwner, CreateView):
     model = Module
     fields = ["name"]
     http_method_names = ["post"]
 
+    def get_object(self):
+        return Course.objects.get(pk=self.kwargs.get("pk"))
+
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        form.instance.course = Course.objects.get(pk=self.kwargs.get("pk"))
+        form.instance.course = self.get_object()
 
         return super().form_valid(form)
 
@@ -116,7 +121,7 @@ class ModuleCreateView(CreateView):
         return reverse_lazy("courses:course-detail", kwargs={"pk": course.pk})
 
 
-class ModuleUpdateView(UpdateView):
+class ModuleUpdateView(mixins.TeacherIsCourseOwner, UpdateView):
     model = Module
     fields = ["name"]
     http_method_names = ["post"]
@@ -125,7 +130,7 @@ class ModuleUpdateView(UpdateView):
         return reverse_lazy("courses:course-detail", kwargs={"pk": self.get_object().course.pk})
 
 
-class ModuleDeleteView(DeleteView):
+class ModuleDeleteView(mixins.TeacherIsCourseOwner, DeleteView):
     model = Module
     http_method_names = ["post"]
 
@@ -133,16 +138,26 @@ class ModuleDeleteView(DeleteView):
         return reverse_lazy("courses:course-detail", kwargs={"pk": self.get_object().course.pk})
 
 
-class LessonCreateView(CreateView):
+class LessonCreateView(mixins.TeacherIsCourseOwner, CreateView):
     model = Lesson
     fields = ["title", "description"]
     template_name = "courses/lesson_create.html"
 
+    def get_object(self) -> Model:
+        return Module.objects.get(pk=self.kwargs.get("pk"))
+
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        form.instance.module = Module.objects.get(pk=self.kwargs.get("pk"))
+        form.instance.module = self.get_object()
 
         self.object = form.instance
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["module"] = self.get_object()
+
+        return context
 
     def get_success_url(self) -> str:
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.object.pk})
@@ -160,7 +175,7 @@ class LessonDetailView(DetailView):
         return super().get_template_names()
 
 
-class LessonDeleteView(DeleteView):
+class LessonDeleteView(mixins.TeacherIsCourseOwner, DeleteView):
     model = Lesson
     http_method_names = ["post"]
 
@@ -168,7 +183,7 @@ class LessonDeleteView(DeleteView):
         return reverse_lazy("courses:course-detail", kwargs={"pk": self.get_object().course.pk})
     
 
-class LessonUpdateView(UpdateView):
+class LessonUpdateView(mixins.TeacherIsCourseOwner, UpdateView):
     model = Lesson
     fields = ["title", "description"]
     context_object_name = "lesson"
@@ -178,14 +193,14 @@ class LessonUpdateView(UpdateView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().pk})
 
 
-class MaterialsCreateView(View):
+class MaterialsCreateView(mixins.TeacherIsCourseOwner, View):
     http_method_names = ["post"]
 
-    def get_lesson(self):
+    def get_object(self):
         return Lesson.objects.get(pk=self.kwargs.get("pk"))
 
     def post(self, *args, **kwargs):
-        lesson = self.get_lesson()
+        lesson = self.get_object()
 
         for file in self.request.FILES.getlist("files"):
             Material.objects.create(lesson=lesson, file=file)
@@ -193,7 +208,7 @@ class MaterialsCreateView(View):
         return redirect(reverse_lazy("courses:lesson-detail", kwargs={"pk": lesson.pk}))
 
 
-class MaterialDeleteView(DeleteView):
+class MaterialDeleteView(mixins.TeacherIsCourseOwner, DeleteView):
     model = Material
     http_method_names = ["post"]
 
@@ -201,13 +216,19 @@ class MaterialDeleteView(DeleteView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().lesson.pk})
     
 
-class TaskCreateView(CreateView):
+class TaskCreateView(mixins.TeacherIsCourseOwner, CreateView):
     model = Task
     fields = ["name", "description"]
     http_method_names = ["post"]
-    
+
+    def get_object(self) -> Model:
+        return Lesson.objects.get(pk=self.kwargs.get("pk"))
+
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        form.instance.lesson = Lesson.objects.get(pk=self.kwargs.get("pk"))
+        form.instance.lesson = self.get_object()
+
+        if form.instance.lesson.course.teacher != self.request.user:
+            raise PermissionDenied
 
         return super().form_valid(form)
     
@@ -215,7 +236,7 @@ class TaskCreateView(CreateView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.kwargs.get("pk")})
 
 
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(mixins.TeacherIsCourseOwner, UpdateView):
     model = Task
     fields = ["name", "description"]
     http_method_names = ["post"]
@@ -224,7 +245,7 @@ class TaskUpdateView(UpdateView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().lesson.pk})
 
 
-class TaskDeleteView(DeleteView):
+class TaskDeleteView(mixins.TeacherIsCourseOwner, DeleteView):
     model = Task
     http_method_names = ["post"]
 
@@ -232,25 +253,27 @@ class TaskDeleteView(DeleteView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": self.get_object().lesson.pk})
 
 
-class TaskCompletionsView(ListView):
+class TaskCompletionsView(mixins.TeacherIsCourseOwner, ListView):
     model = Completion
     context_object_name = "completions"
     template_name = "courses/task_completions.html"
+    allow_empty = True
+
+    def get_object(self):
+        return Task.objects.get(pk=self.kwargs.get("pk"))
 
     def get_queryset(self):
-        task = Task.objects.get(pk=self.kwargs.get("pk"))
-
-        return Completion.objects.filter(task=task)
+        return Completion.objects.filter(task=self.get_object())
     
     def get_context_data(self, **kwargs):
         context =  super().get_context_data(**kwargs)
 
-        context["task"] = Task.objects.get(pk=self.kwargs.get("pk"))
+        context["task"] = self.get_object()
 
         return context
 
 
-class CompletionCreateView(CreateView):
+class CompletionCreateView(mixins.UserIsCourseStudent, CreateView):
     model = Completion
     fields = ["text"]
     http_method_names = ["post"]
@@ -264,6 +287,9 @@ class CompletionCreateView(CreateView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": task.lesson.pk})
 
     def form_valid(self, form: BaseModelForm):
+        if self.model.objects.filter(task=self.get_task(), student=self.request.user).exists():
+            return HttpResponse(status=409)
+
         form.instance = form.save(commit=False)
 
         form.instance.student = self.request.user
@@ -293,7 +319,7 @@ class CompletionDeleteView(DeleteView):
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": task.lesson.pk})
     
 
-class GradeCompletionView(CreateView):
+class GradeCompletionView(mixins.TeacherIsCourseOwner, CreateView):
     model = Grade
     fields = ["value"]
     http_method_names = ["post"]
@@ -309,7 +335,7 @@ class GradeCompletionView(CreateView):
         return reverse_lazy("courses:task-completions", kwargs={"pk": completion.task.pk})
 
 
-class GradeDeleteView(DeleteView):
+class GradeDeleteView(mixins.TeacherIsCourseOwner, DeleteView):
     model = Grade
     http_method_names = ["post"]
 

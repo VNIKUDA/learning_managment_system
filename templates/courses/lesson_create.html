@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container">
     <div class="d-flex justify-content-center gap-3">
-        <form action="" method="post" class="w-75">
+        <form action="{% url 'courses:lesson-create' module.pk %}" method="post" class="w-75">
             {% csrf_token %}
             <label for="title">Назва: </label>
             <input type="text" name="title" id="title" class="form-control" required>
