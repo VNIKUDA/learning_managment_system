@@ -146,4 +146,4 @@ class Grade(models.Model):
     completion = models.OneToOneField(Completion, on_delete=models.CASCADE, related_name="grade")
 
     def __str__(self) -> str:
-        return f"{self.completion}: {self.grade}"
+        return f"{self.completion}: {self.value}"

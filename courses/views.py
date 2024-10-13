@@ -49,7 +49,7 @@ class CourseHomeView(DetailView):
     template_name = "courses/course_home.html"
 
     def get_template_names(self) -> list[str]:
-        if self.request.user.is_staff or self.get_object().teacher == self.request.user:
+        if self.get_object().teacher == self.request.user:
             return ["courses/teacher_course_home.html"]
         
         return super().get_template_names()
@@ -278,11 +278,11 @@ class CompletionCreateView(mixins.UserIsCourseStudent, CreateView):
     fields = ["text"]
     http_method_names = ["post"]
 
-    def get_task(self):
-        return Task.objects.get(pk=self.kwargs.get("pk"))
+    def get_course(self):
+        return Task.objects.get(pk=self.kwargs.get("pk")).lesson.course
 
     def get_success_url(self) -> str:
-        task = self.get_task()
+        task = Task.objects.get(pk=self.kwargs.get("pk"))
 
         return reverse_lazy("courses:lesson-detail", kwargs={"pk": task.lesson.pk})
 
@@ -323,6 +323,9 @@ class GradeCompletionView(mixins.TeacherIsCourseOwner, CreateView):
     model = Grade
     fields = ["value"]
     http_method_names = ["post"]
+
+    def get_object(self) -> Model:
+        return Completion.objects.get(pk=self.kwargs.get("pk"))
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         form.instance.completion = Completion.objects.get(pk=self.kwargs.get("pk"))

@@ -21,14 +21,17 @@ class TeacherIsCourseOwner(UserIsTeacher):
             elif isinstance(instance, models.Task) or isinstance(instance, models.Material):
                 return instance.lesson.course.teacher == self.request.user
             
-            elif isinstance(instance, models.Grade):
+            elif isinstance(instance, models.Completion):
                 return instance.task.lesson.course.teacher == self.request.user
+
+            elif isinstance(instance, models.Grade):
+                return instance.completion.task.lesson.course.teacher == self.request.user
 
         return False
 
 class UserIsCourseStudent(PermissionRequiredMixin):
     def has_permission(self) -> bool:
-        return self.request.user in self.get_task().lesson.course.students.all()
+        return self.request.user in self.get_course().students.all()
 
 class UserIsCompletionOwner(PermissionRequiredMixin):
     def has_permission(self) -> bool:

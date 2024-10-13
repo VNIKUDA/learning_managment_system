@@ -27,20 +27,17 @@ class AccountManager(BaseUserManager):
             username=username,
         )
 
-        Profile.objects.create(account=user)
-
         user.set_password(password)
         user.save(using=self._db)
+
         return user
 
     def create_superuser(self, email, username, password=None):
         user = self.create_user(
-            email,
-            password=password,
+            email=email,
             username=username,
+            password=password,
         )
-
-        Profile.objects.create(account=user)
 
         user.role = "admin"
         user.save(using=self._db)
@@ -55,7 +52,7 @@ class Account(AbstractBaseUser):
     )
 
     email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
-    username = models.CharField(max_length=255, validators=[MinLengthValidator(5, 'Поле "Username" не повинно бути менше 5 символів')])
+    username = models.CharField(max_length=255, validators=[MinLengthValidator(5, 'Username must be at least 5 characters long')])
     role = models.CharField(default="student", choices=ROLE_CHOICES, max_length=30)
     
     objects = AccountManager()
@@ -74,14 +71,15 @@ class Account(AbstractBaseUser):
         return True
 
     def save(self, *args, **kwargs) -> None:
+        create_profile = self.pk is None
         super().save(*args, **kwargs)
-        
-        Profile.objects.get_or_create(account=self)
 
+        if create_profile:
+            Profile.objects.create(account=self)
 
     @property
     def is_staff(self):
-        return self.role in ["teacher", "admin"]
+        return self.role == "admin"
     
     @property
     def is_teacher(self):
