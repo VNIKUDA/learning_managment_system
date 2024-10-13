@@ -46,7 +46,7 @@ The main goal of this project is to build a robust and scalable system for manag
 ## Technical Requirements
 
 - **Frontend**: HTML, Bootstrap
-- **Backend**: Django, SQLite
+- **Backend**: Django, PostgreSQL
 
 ## Usage
 
@@ -54,7 +54,3 @@ The main goal of this project is to build a robust and scalable system for manag
 - Students can view and enroll in courses, complete completions, and check their grades.
 - Teachers can create courses and modules, add lessons, and grade task completion.
 - Administrators have full control over the platform and can manage users, courses, lessons, and grades.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
